@@ -1,0 +1,64 @@
+------------------------------------------ Project Setup -------------------------------------------------------------------- 
+1. Add publish\bin location to the project properties
+2. Create IIS application for click once 
+   * See IIS setup below
+3. Remove auto increment within the published properties
+4. Create certificate
+5. Publish to the new publish\bin location
+6. Add the configuration file for each environment with the extension of the environment
+   NOTE: You can change this by altering the Execute.ps1 script
+7. Execute deployment to your IIS location based on your prompts
+8. When testing your deployment:
+  a. Use IE or MS Edge.  You can use Chrome, but you can only test the "Run" button. In order to test "Launch" (i.e. direct to manifest) in Chrome, you will need to download a click-once extension.
+  b. Delete your cache from any previous deployments.  Mismatch will occcur between environment tests.  Cache environment is located at: C:\Users\<Window login>\AppData\Local\Apps\2.0
+  c. Test away...
+
+------------------------------------------------------  IIS Setup ----------------------------------------------------------
+1. Setup Services folder
+  - Create a "new folder" that will be used to house all environments
+    a. Within this folder create:  DEV, QA, PROD
+  - Select the "new folder" to view settings on the right
+- Click on "Mime Types" to allow for all extensions needed by click-once
+  - Make sure that the mime type exists. If not, please add. We may have a few others, but these should be verified to start.
+     1.- Extension: .application
+       - MIME Type:  application/x-ms-application
+     2.- Extension: .zip 
+       - MIME Type: application/x-zip-compressed 
+     3.- Extension: .z 
+       - MIME Type: application/x-compress 
+     4.- Extension: .appcache 
+       - MIME Type: text/cache-manifest   
+     5.- Extension: .json 
+       - MIME Type: application/json 
+     6.- Extension: .jsonid 
+       - MIME Type: application/ld+json
+     7.- Extension: .less
+       - MIME Type: text/css
+
+---------------------------------------------------------- NOTES -----------------------------------------------------
+IMPORTANT: During the development, I worked through some errors. The main one was "Reference in the deployment does not match the identity defined in the application manifest.".  The error is slightly deceiving.  Yes, there is a mismatch of sorts.  I found the issue to be primarily from was files where copied or how the folder structure was copied to the IIS directory.  
+
+What I did to trouble-shoot. 
+1. The obvious. I debugged the power shell script to ensure that all the dependencies where updated.  
+
+2. I published a deployment directly from my probject to an IIS directory for testing. This direct publishing should work.  If your direct publish from your project does not work, work with your project to find the issues with your direct publish. This has to work first. 
+ NOTE: When testing/working with your direct publish, do not use the same directory where you are executing your deployment script (Power Shell execute script for publishing).   
+
+3. I used the direct publish to compare the files my power shell copied and altered to verify that all hashes were updated and all files were in order.  It is really important that all file hashes are updated in all manifests and that all configs are updated according to your expectations (i.e. Paths are updated correctly if needed. For example if WCF endpoints are used and need to be updated).  
+
+4. Use this project to compare with yours as well.  I would even setup this project and succesfully exeute a publish.  
+
+5. Be careful of what dependencies you include in your Application Files (i.e. right click on the project, select "Publish", click on "Application Files". The files should not include things like setup.exe or publish.htm, only the dependencies needed by the application to execute). 
+
+6. Default publish.htm for testing: 
+   a. Always make sure you can click on "Run" (i.e. execute the download of setup.exe and execute it) before trying to launch the manifest directly.  There are different issues.  If you get the execution of setup successful, than you know it works.  Launch would be a separate issue.  See next item for those. 
+   b. When launching using the direct endpoint to the manifest, it seems that chrome has an issue.  You get an error something like "System.Deployment.Application.DeploymentDownloadException (Unknown subtype)".  You can download an extension for click-once.  There are a couple. You choose.  I had tried a couple and they do work. However, IE or MS Edge always work.  One caveat to this item, only investigate any failure with click "Launch" if the remote setup download works (i.e. clicking "run"). 
+   c. Get this page to work, you can build out your own now for each environment. 
+
+7.  When executing a new publish to an envionrment, remember the following:
+    a. Clear cache: C:\Users\<Window login>\AppData\Local\Apps\2.0
+    b. Reset IIS site or clear application pool associated with site
+
+8.  Between testing/executing click-once environments (i.e. executing endpoints from Publish.htm): 
+    a. Clear cache: C:\Users\<Window login>\AppData\Local\Apps\2.0
+
