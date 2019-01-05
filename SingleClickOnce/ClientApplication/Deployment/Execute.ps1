@@ -269,12 +269,12 @@ Try
 		throw "Main::GetMageUtil - Could not find MAGE utility"
 	}
 	
-	# 1.  Decide on environment (i.e. viruatl directory where DEV,QA,PROD reside )
+	# 1.  Decide on environment (i.e. virtual directory where Test,QA,PROD reside )
     $deployFromPublishPath = Join-Path -Path $pslocation -ChildPath "Publish\bin"
     
-    $environment = (Read-Host -Prompt "Which envrionment are you deploying (i.e.DEV, QA, PROD)?").ToUpper() 
-    While($environment -ne 'DEV' -and $environment -ne 'QA' -and $environment -ne 'PROD'){
-        $environment = (Read-Host -Prompt "Please respond with either 'DEV', 'QA' or 'PROD'. Enter 'X' to exit.").ToUpper() 
+    $environment = (Read-Host -Prompt "Which environment are you deploying (i.e. Test, QA, PROD)?").ToUpper() 
+    While($environment -ne 'Test' -and $environment -ne 'QA' -and $environment -ne 'PROD'){
+        $environment = (Read-Host -Prompt "Please respond with either 'Test', 'QA' or 'PROD'. Enter 'X' to exit.").ToUpper() 
         if ($environment -eq 'X'){
             return
         }
@@ -302,7 +302,7 @@ Try
     
     #5. Setup 
     
-	#5.A  file names - these are the expected file fnames 
+	#5.1  file names - these are the expected file fnames 
     $applicationManifestFileName = "ClientApplication.application"
     $certFileName = "ClientApplication_TemporaryKey.pfx" 
 	$appConfigENV =  ("App.config.{0}" -f $environment)
@@ -311,7 +311,7 @@ Try
 	$deployAppExecNameName = "ClientApplication.exe.deploy" 
     $setupExec = "setup.exe" 
  
-    #5.B pointers
+    #5.2 pointers
     $applicationFileLocation = (Join-Path -Path $deployToPath -ChildPath ("Application Files"))
 	$applicationFilePaths = (Get-ChildItem -Path "$applicationFileLocation") | Sort-Object -Descending
     $destBinaryLocation = $applicationFilePaths[0].FullName
@@ -324,7 +324,7 @@ Try
     $destDeployAppExecFile = (Join-Path -Path $destBinaryLocation -ChildPath $deployAppExecName)
 	$setupPath = (Join-Path -Path $deployToPath -ChildPath $setupExec)
     
-    #5.C Validation 
+    #5.3 Validation 
     If (( Test-Path -Path ($setupPath)) -ne $true){
 		throw "Cannot locate - $setupPath. Copy failed."
 	}
@@ -350,7 +350,7 @@ Try
 		throw "Cannot locate - $destConfigFile.  Copy failed."
 	}
 
-	#5.D change the setup objects in the destination to point to generated environment endpoint
+	#5.4 change the setup objects in the destination to point to generated environment endpoint
     StartProcess -commandfileName $setupPath  -commandarguments " -url=""$deploymentUrl""" 
 
     #NOTE: Switch config content to the environment
@@ -363,7 +363,7 @@ Try
 	#Update the configuration appsettings section
     UpdateAppSettings -destConfigContent $destConfigContent -envAppConfigContent $envAppConfigContent 
 
-    #5.E Update hash in all binaries
+    #5.5 Update hash in all binaries
     UpdateManifestHash -destAppManifestFile $destAppManifestFile -destBinaryLocation $destBinaryLocation
 
     #NOTE: In order to avoid MSB3113 (file not found) errors on the next step, I removed the ".deploy" on a copy.  
@@ -373,6 +373,7 @@ Try
     [string[]]$versionDeployFiles = Get-ChildItem -File -Filter "*.deploy" -Path $destBinaryLocation -Recurse -Name
     $filesToCleanup = New-Object System.Collections.ArrayList
 
+	#Copy the existing .deploy files to a file without the ".deploy" extension.  As mentioned, this is a work around.
     foreach($deployFile in $versionDeployFiles) {
         $nonDeployFile = (Join-Path -Path $destBinaryLocation -childpath ($deployFile.Replace(".deploy","")))
         $deployFile = (Join-Path -Path $destBinaryLocation -childpath $deployFile)
@@ -382,31 +383,30 @@ Try
     }
 
     #NOTE: Set the cert again - for the application manifest, there will be MSB3113 errors (file not found). 
-    #this is because the files are virtual for the manifest.  For this process, it can be ignored.  
-    #I did try to find out a way to pass the root path to its location to fix the error but could not determine 
-    #which of the mage options would help me.  I just accepted the errors. 
+    #It appears that this may be due to it looking for the exact referenced names. I try to fix this error 
+	#by making a copy of the file without the ".deploy" extenstion.  However, if I see the errors, I just accepted them.  
+	#Seems that the utility is able to update the manifest without an issue.
     StartProcess -commandfileName $mageUtil -commandarguments " -u ""$destAppManifestFile"" -cf ""$certFileLocation""" 
 
     WriteMessage -msg "Delete temp files created earlier"
     
-    #5.F Clean up temporary files to satisify cert update and avoid MSB3113 errors
-    
+    #5.6 Clean up temporary files to satisify cert update and avoid MSB3113 errors
     foreach($fileToCleanup in $filesToCleanup){
         Remove-Item -Path $fileToCleanup
     }
 
     WriteMessage -msg "Update deployment manifest" 
     
-    #5.G Update deployment manifest with application manifest hash
+    #5.7 Update deployment manifest with application manifest hash
     $configHash = ComputeHash -filePath  $destAppManifestFile
     [xml]$manifestFileContent = (Get-Content -Path $deploymentManifestFile)
     $manifestFileContent.assembly.dependency.dependentAssembly.hash.DigestValue = $configHash 
     $manifestFileContent.Save($deploymentManifestFile);
 
-    #5.H Update cert for deployment manifest
+    #5.8 Update cert for deployment manifest
     StartProcess -commandfileName $mageUtil -commandarguments " -u ""$deploymentManifestFile"" -cf ""$certFileLocation""" 
 
-    #5.I Copy the deployment manifest back to the version folder
+    #5.9 Copy the deployment manifest back to the version folder
     Copy-Item -Path $deploymentManifestFile -Destination $destDeploymentManifestFile -Force -Recurse
 
 	WriteMessage -msg "Deployment for $environment complete!"

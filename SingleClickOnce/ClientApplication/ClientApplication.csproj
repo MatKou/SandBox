@@ -93,11 +93,11 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Deployment\App.config.TEST" />
     <None Include="Deployment\ClientApplication_TemporaryKey.pfx" />
     <None Include="Deployment\App.config.PROD" />
     <None Include="Deployment\App.config.QA" />
     <None Include="Deployment\Execute.ps1" />
-    <None Include="Deployment\IIS Setup Instructions\deployment_setup.xlsx" />
     <None Include="Deployment\Publish\bin\ClientApplication.application" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

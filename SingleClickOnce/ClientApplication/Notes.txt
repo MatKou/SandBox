@@ -1,4 +1,4 @@
-------------------------------------------Setup project -------------------------------------------------------------------- 
+------------------------------------------ Project Setup -------------------------------------------------------------------- 
 1. Add publish\bin location to the project properties
 2. Create IIS application for click once 
    * See IIS setup below

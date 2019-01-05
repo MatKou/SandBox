@@ -8,6 +8,7 @@ namespace Common
             NOTSET,
             PROD,
             QA,
+            TEST,
             DEV
         }
     }

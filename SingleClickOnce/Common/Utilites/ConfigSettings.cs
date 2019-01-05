@@ -16,7 +16,7 @@ namespace Common
                     Enums.Environments environment;
                     string value = ConfigurationManager.AppSettings[ENVIRONMENT];
 
-                    if (!Enum.TryParse<Enums.Environments>(value, out environment))
+                    if (!Enum.TryParse<Enums.Environments>(value, true, out environment))
                     {
                         environment = Enums.Environments.NOTSET;
                     }
