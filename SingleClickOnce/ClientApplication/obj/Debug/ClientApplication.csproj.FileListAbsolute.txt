@@ -1,0 +1,4 @@
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\ClientApplication\bin\Debug\ClientApplication.exe.config
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\ClientApplication\obj\Debug\ClientApplication.csprojResolveAssemblyReference.cache
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\ClientApplication\obj\Debug\ClientApplication.exe
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\ClientApplication\obj\Debug\ClientApplication.pdb

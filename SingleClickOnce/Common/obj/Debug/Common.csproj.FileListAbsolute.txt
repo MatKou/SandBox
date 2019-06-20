@@ -1,0 +1,5 @@
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\Common\bin\Debug\Common.dll
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\Common\bin\Debug\Common.pdb
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\Common\obj\Debug\Common.csprojResolveAssemblyReference.cache
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\Common\obj\Debug\Common.dll
+C:\Users\mathieu.koumbo\Source\Repos\SandBox\SingleClickOnce\Common\obj\Debug\Common.pdb
